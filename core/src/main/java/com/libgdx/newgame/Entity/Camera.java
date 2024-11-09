@@ -12,46 +12,40 @@ import com.badlogic.gdx.math.Vector2;
 import com.libgdx.newgame.Management.Direction;
 
 public class Camera{
-    private float x, y;                  // Position de la caméra
-    private float detectionDistance;     // Distance maximale de détection
-    private float detectionAngle;  // L'angle de détection (100° ici)
+    private float x, y;
 
-    private Sprite sprite;               // Sprite représentant la caméra
-    private Texture texture;             // Texture associée au sprite de la caméra
+    private float detectionDistance;
+    private float detectionAngle;
+    private Direction direction;
 
-    private Sound alertSound;            // Son d'alerte
-    private boolean isAlertPlaying = false; // Pour éviter de rejouer le son en boucle
+    private Sprite sprite;
+    private Texture texture;
+
+    private Sound alertSound;
+    private boolean isAlertPlaying = false;
 
     private boolean showDetectionZone;
-    private ShapeRenderer shapeRenderer; // Renderer pour dessiner la zone de détection
+    private ShapeRenderer shapeRenderer;
 
-    private Direction direction;         // Direction de détection de la caméra (via l'enum)
-
-
-    // Constructeur de la caméra avec l'enum Direction comme paramètre
     public Camera(float x, float y, float detectionDistance, float detectionAngle, Direction direction, String image, String alertSoundFile, boolean showDetectionZone) {
         this.x = x;
         this.y = y;
         this.detectionDistance = detectionDistance;
         this.detectionAngle = detectionAngle;
-        this.direction = direction; // Affecter la direction via l'enum
+        this.direction = direction;
         this.texture = new Texture(image);
         this.sprite = new Sprite(texture);
         this.sprite.setOrigin(sprite.getWidth() / 2, sprite.getHeight() / 2);
         this.sprite.setPosition(x - sprite.getWidth() / 2, y - sprite.getHeight() / 2);
         this.showDetectionZone = showDetectionZone;
-
-        // Charger le son d'alerte
         this.alertSound = Gdx.audio.newSound(Gdx.files.internal(alertSoundFile));
-
-        // Initialisation de ShapeRenderer pour la zone de détection
         this.shapeRenderer = new ShapeRenderer();
     }
 
     // Vérifie si le joueur est dans le périmètre de détection de la caméra
     public void checkPlayerInDetectionZone(Player player) {
         Vector2 playerPosition = player.getPosition();
-        Vector2 detectionPoint = playerPosition;  // Utilisation de la position du joueur sans distinction haut/bas
+        Vector2 detectionPoint = playerPosition;
 
         Vector2 cameraPosition = new Vector2(x, y);
 
@@ -67,23 +61,23 @@ public class Camera{
             // Calcul de l'angle entre la direction de la caméra et le joueur
             float angleToPlayer = cameraDirection.angleDeg(toPlayer);
 
-            // Vérifie si le joueur est dans l'angle de détection de 100 degrés (50° à gauche et à droite)
-            if (Math.abs(angleToPlayer) <= detectionAngle / 2) {  // Angle de 100° autour de la direction de la caméra
+            // Vérifie si le joueur est dans l'angle de détection
+            if (Math.abs(angleToPlayer) <= detectionAngle / 2) {
                 if (!isAlertPlaying) {
-                    alertSound.loop();  // Joue le son en boucle
+                    alertSound.loop();
                     isAlertPlaying = true;
                 }
             } else {
                 // Si le joueur sort de la zone de détection, arrêter le son
                 if (isAlertPlaying) {
-                    alertSound.stop();  // Arrête la boucle
+                    alertSound.stop();
                     isAlertPlaying = false;
                 }
             }
         } else {
             // Si le joueur est en dehors du périmètre, arrêter le son
             if (isAlertPlaying) {
-                alertSound.stop();  // Arrête la boucle
+                alertSound.stop();
                 isAlertPlaying = false;
             }
         }
