@@ -4,12 +4,13 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.Array;
 import com.libgdx.newgame.Entity.Camera;
 import com.libgdx.newgame.Entity.Enemy;
 import com.libgdx.newgame.Entity.Player;
 import com.libgdx.newgame.Management.AlertManagement;
+import com.badlogic.gdx.Input;
+import com.libgdx.newgame.Management.Direction;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends Game {
@@ -18,22 +19,23 @@ public class Main extends Game {
 
     private Player player;
     private Enemy enemy;
-    private Camera camera;
-
-    private ShapeRenderer shapeRenderer;
+    private Array<Camera> cameras;
 
     private float screenWidth, screenHeight;
 
     @Override
     public void create() {
         batch = new SpriteBatch();
-        shapeRenderer = new ShapeRenderer();
         screenWidth = Gdx.graphics.getWidth();
         screenHeight = Gdx.graphics.getHeight();
 
         player = new Player(400, 800, 200, screenWidth, screenHeight, "player.png");
         enemy = new Enemy(200,300, 50f, 200, 200, 600, 300, "player.png");
-        camera = new Camera(1150, 750, 0, 200, 120, "camera.png");
+
+        cameras = new Array<>();
+        cameras.add(new Camera(1100, 700, 300, 100,  Direction.LEFT, "camera_left.png", "alert.mp3", false));
+        cameras.add(new Camera(100, 700, 300, 100,  Direction.RIGHT, "camera_right.png", "alert.mp3", false));
+
         AlertManagement.initializeAlert();
     }
 
@@ -48,9 +50,11 @@ public class Main extends Game {
 
         player.render(batch);
         enemy.render(batch);
-        camera.render(batch);
 
-        enemy.renderZone();
+        for (Camera camera : cameras) {
+            camera.checkPlayerInDetectionZone(player);
+            camera.render(batch);
+        }
 
         AlertManagement.renderAlert(batch, player, enemy);
     }
@@ -60,7 +64,6 @@ public class Main extends Game {
         batch.dispose();
         player.dispose();
         enemy.dispose();
-        shapeRenderer.dispose();
         AlertManagement.dispose();
     }
 }
