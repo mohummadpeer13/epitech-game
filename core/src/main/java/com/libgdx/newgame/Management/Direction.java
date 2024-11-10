@@ -1,8 +1,8 @@
 package com.libgdx.newgame.Management;
 
 public enum Direction {
-    UP(90),
-    DOWN(-90),
+    UP(0),
+    DOWN(-180),
     LEFT(230),
     RIGHT(-30);
 

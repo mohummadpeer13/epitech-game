@@ -9,7 +9,6 @@ import com.libgdx.newgame.Entity.Camera;
 import com.libgdx.newgame.Entity.Enemy;
 import com.libgdx.newgame.Entity.Player;
 import com.libgdx.newgame.Management.AlertManagement;
-import com.badlogic.gdx.Input;
 import com.libgdx.newgame.Management.Direction;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
@@ -30,7 +29,7 @@ public class Main extends Game {
         screenHeight = Gdx.graphics.getHeight();
 
         player = new Player(400, 800, 200, screenWidth, screenHeight, "player.png");
-        enemy = new Enemy(200,300, 50f, 200, 200, 600, 300, "player.png");
+        enemy = new Enemy(200,300, 50f, 200, 200, 600, 300, "player.png", 400,100,true, Direction.UP);
 
         cameras = new Array<>();
         cameras.add(new Camera(1100, 700, 300, 100,  Direction.LEFT, "camera_left.png", "alert.mp3", false));
@@ -56,7 +55,7 @@ public class Main extends Game {
             camera.render(batch);
         }
 
-        AlertManagement.renderAlert(batch, player, enemy);
+        enemy.checkPlayerInDetectionZone(player);
     }
 
     @Override

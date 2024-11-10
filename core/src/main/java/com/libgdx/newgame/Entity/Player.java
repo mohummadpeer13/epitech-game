@@ -2,10 +2,11 @@ package com.libgdx.newgame.Entity;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.libgdx.newgame.Management.DetectionZoneManager;
 
 public class Player extends  Initialize{
-
     private float zoneWidth, zoneHeight;
 
     public Player(float x, float y, float speed, float zoneWidth, float zoneHeight, String sprite) {

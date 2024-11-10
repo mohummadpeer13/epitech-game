@@ -16,7 +16,6 @@ public class AlertManagement {
     private static boolean alert = false;
     private static Sound son;
 
-    // Initialisation de l'alerte
     public static void initializeAlert() {
         alertTexture = new Texture("alert.png");
         alertSprite = new Sprite(alertTexture);
@@ -42,8 +41,8 @@ public class AlertManagement {
         float angleToPlayer = enemyDirection.angleDeg(toPlayer);
 
         // Paramètres de détection
-        float detectionDistance = 500f;  // Distance maximale de détection (par exemple, 500 pixels)
-        float detectionAngle = 60f;      // 60° de chaque côté pour un total de 120° devant l'ennemi
+        float detectionDistance = 200;  // Distance maximale de détection (par exemple, 500 pixels)
+        float detectionAngle = 50;      // 60° de chaque côté pour un total de 120° devant l'ennemi
 
         // Vérifie si le joueur est dans le cône de détection
         boolean isInDetectionRange = distanceToPlayer <= detectionDistance && Math.abs(angleToPlayer) <= detectionAngle;

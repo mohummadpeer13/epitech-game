@@ -1,25 +1,28 @@
 package com.libgdx.newgame.Entity;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.libgdx.newgame.Management.DetectionZoneManager;
+import com.libgdx.newgame.Management.Direction;
 
 public class Enemy extends Initialize {
     private float zoneX, zoneY, zoneWidth, zoneHeight;  // Zone dans laquelle l'ennemi se déplace
-    private ShapeRenderer shapeRenderer;
     private float velocityX;  // Vitesse horizontale
     private float rotation;   // Angle de rotation en degrés
+    private DetectionZoneManager detectionZoneManager;
+    private boolean showDetectionZone;
+    private Direction direction;
 
-    public Enemy(float x, float y, float speed, float zoneX, float zoneY, float zoneWidth, float zoneHeight, String sprite) {
+    public Enemy(float x, float y, float speed, float zoneX, float zoneY, float zoneWidth, float zoneHeight, String sprite,float detectionDistance, float detectionAngle, boolean showDetectionZone, Direction direction) {
         super(x, y, speed, sprite);
         this.zoneX = zoneX;
         this.zoneY = zoneY;
         this.zoneWidth = zoneWidth;
         this.zoneHeight = zoneHeight;
-        this.shapeRenderer = new ShapeRenderer();
+        this.detectionZoneManager = new DetectionZoneManager(detectionDistance, detectionAngle, "alert.mp3");
         this.velocityX = speed;
-
-        // Initialiser l'orientation de l'ennemi (vers la droite par défaut)
+        this.showDetectionZone = showDetectionZone;
+        this.direction = direction;
         this.rotation = 0; // 0 degrés signifie qu'il regarde vers la droite
     }
 
@@ -34,46 +37,42 @@ public class Enemy extends Initialize {
             velocityX = Math.abs(velocityX); // Repart vers la droite
             currentImage = rightImage;
             rotation = 0;  // 0 degrés signifie qu'il regarde vers la droite
+            direction = Direction.UP;
         }
         if (x > zoneX + zoneWidth - sprite.getWidth()) {
             x = zoneX + zoneWidth - sprite.getWidth();
             velocityX = -Math.abs(velocityX);  // Repart vers la gauche
             currentImage = leftImage;
             rotation = 180; // 180 degrés signifie qu'il regarde vers la gauche
+            direction = Direction.DOWN;
         }
 
         // S'assurer que la position de l'ennemi reste la même en y
         y = zoneY + zoneHeight / 2 - sprite.getHeight() / 2;
 
-        // Mettre à jour la position du sprite
         sprite.setPosition(x, y);
     }
 
-    // Méthode pour afficher la zone de détection de 180° de l'ennemi
-    public void renderZone() {
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(Color.RED);
-
-        // Position de l'ennemi
-        Vector2 enemyPosition = new Vector2(x, y);
-
-        // Rayon de la zone de détection (par exemple, 200 pixels)
-        float detectionRadius = 200;
-
-        // Dessiner un secteur de cercle de 180° devant l'ennemi
-        float startAngle = rotation - 90; // L'angle de début du secteur (-90° à +90°)
-        shapeRenderer.arc(enemyPosition.x, enemyPosition.y, detectionRadius, startAngle, 180);
-
-        shapeRenderer.end();
+    @Override
+    public void render(SpriteBatch batch) {
+        super.render(batch);
+        if (showDetectionZone){
+            Vector2 cameraPosition = new Vector2(x, y);
+            detectionZoneManager.renderDetectionZone(cameraPosition, direction.getAngle());
+        }
     }
 
-    // Libérer les ressources
+    // Vérifie si le joueur est dans la zone de détection de la caméra
+    public void checkPlayerInDetectionZone(Player player) {
+        Vector2 playerPosition = player.getPosition();
+        Vector2 cameraPosition = new Vector2(x, y);
+        detectionZoneManager.checkPlayerInDetectionZone(cameraPosition, playerPosition,direction.getAngle());
+    }
+
     public void dispose() {
         sprite.getTexture().dispose();
-        shapeRenderer.dispose();
     }
 
-    // Getters pour la zone de déplacement
     public float getZoneX() { return zoneX; }
     public float getZoneY() { return zoneY; }
     public float getZoneWidth() { return zoneWidth; }
