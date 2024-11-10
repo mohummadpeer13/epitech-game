@@ -8,15 +8,21 @@ buildscript {
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
   }
+
   dependencies {
-
-
+    classpath 'org.jacoco:org.jacoco.core:0.8.9'  // Ajout de Jacoco
   }
 }
 
 allprojects {
   apply plugin: 'eclipse'
   apply plugin: 'idea'
+  apply plugin: 'jacoco'  // Application du plugin Jacoco pour tous les sous-projets
+
+  // Configure Jacoco dans tous les sous-projets
+  jacoco {
+    toolVersion = "0.8.9"
+  }
 
   // This allows you to "Build and run using IntelliJ IDEA", an option in IDEA's Settings.
   idea {
@@ -29,22 +35,23 @@ allprojects {
 
 configure(subprojects) {
   apply plugin: 'java-library'
+  apply plugin: 'jacoco'  // Application du plugin Jacoco dans chaque sous-projet
   sourceCompatibility = 17
 
-  // From https://lyze.dev/2021/04/29/libGDX-Internal-Assets-List/
-  // The article can be helpful when using assets.txt in your project.
+  // Configuration Jacoco pour générer les rapports de couverture
+  jacocoTestReport {
+    dependsOn test  // Générer les rapports après l'exécution des tests
+    reports {
+      xml.required = true
+      html.required = true  // Génère le rapport HTML dans 'build/reports/jacoco/test/html'
+    }
+  }
+
   tasks.register('generateAssetList') {
     inputs.dir("${project.rootDir}/assets/")
-    // projectFolder/assets
     File assetsFolder = new File("${project.rootDir}/assets/")
-    // projectFolder/assets/assets.txt
     File assetsFile = new File(assetsFolder, "assets.txt")
-    // delete that file in case we've already created it
     assetsFile.delete()
-
-    // iterate through all files inside that folder
-    // convert it to a relative path
-    // and append it to the file assets.txt
     fileTree(assetsFolder).collect { assetsFolder.relativePath(it) }.sort().each {
       assetsFile.append(it + "\n")
     }
@@ -62,12 +69,32 @@ subprojects {
   repositories {
     mavenCentral()
     maven { url 'https://s01.oss.sonatype.org' }
-    // You may want to remove the following line if you have errors downloading dependencies.
     mavenLocal()
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
     maven { url 'https://jitpack.io' }
   }
+
+  // Ajout des dépendances de tests JUnit et Mockito
+  dependencies {
+    testImplementation 'org.mockito:mockito-inline:5.0.0'  // Version la plus récente de mockito-inline
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'  // API JUnit 5
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.8.2'  // Moteur JUnit 5
+    testImplementation 'org.mockito:mockito-core:3.11.2' // Mockito pour les mocks
+    testImplementation 'org.powermock:powermock-api-mockito2:2.0.9'  // PowerMock pour Mockito
+    testImplementation 'org.powermock:powermock-module-junit4:2.0.9'  // PowerMock pour JUnit 4
+
+  }
+
+  test {
+    useJUnit()  // Utiliser JUnit 4 pour les tests
+    testLogging {
+      events "passed", "skipped", "failed"
+    }
+    jvmArgs += "-XX:+EnableDynamicAgentLoading"
+  }
+
+
 }
 
 eclipse.project.name = 'new-game' + '-parent'

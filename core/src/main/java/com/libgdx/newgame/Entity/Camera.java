@@ -10,12 +10,13 @@ import com.libgdx.newgame.Management.DetectionZoneManager;
 import com.libgdx.newgame.Management.Direction;
 
 public class Camera{
-    private float x, y;
-    private Sprite sprite;
-    private Texture texture;
+    public float x;
+    public float y;
+    public Sprite sprite;
+    public Texture texture;
     private DetectionZoneManager detectionZoneManager;
     private Direction direction;
-    private boolean showDetectionZone;
+    public boolean showDetectionZone;
 
     public Camera(float x, float y, float detectionDistance, float detectionAngle, Direction direction,
                   String image, String alertSoundFile, boolean showDetectionZone) {
@@ -54,5 +55,21 @@ public class Camera{
     public void dispose() {
         texture.dispose();
         detectionZoneManager.dispose();
+    }
+
+    public float getX() {
+        return x;
+    }
+
+    public float getY() {
+        return y;
+    }
+
+    public Texture getTexture() {
+        return texture;
+    }
+
+    public Sprite getSprite() {
+        return sprite;
     }
 }

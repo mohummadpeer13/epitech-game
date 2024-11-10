@@ -9,7 +9,7 @@ public class Enemy extends Initialize {
     private float zoneX, zoneY, zoneWidth, zoneHeight;  // Zone dans laquelle l'ennemi se déplace
     private float velocityX;  // Vitesse horizontale
     private float rotation;   // Angle de rotation en degrés
-    private DetectionZoneManager detectionZoneManager;
+    public DetectionZoneManager detectionZoneManager;
     private boolean showDetectionZone;
     private Direction direction;
 
